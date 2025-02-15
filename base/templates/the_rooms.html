@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms</title>
+</head>
+<body>
+    <a href="{% url 'create-room' %}">CREATE ROOM</a>
+    <hr>
+   
+    <div class="room-container">
+        {% for room in rooms %}
+        <div class="room">
+            <a href="{% url 'delete-room' pk=room.id %}">DELETE</a>
+            <a href="{% url 'update-room' pk=room.id %}">EDIT</a>
+            
+            <span>@{{ room.host.username }}</span>
+            <h5>{{ room.id }}</h5>
+            <h3><a href="{% url 'room-detail' room.id %}">Topic: {{ room.name }}</a></h3>
+            <hr>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
