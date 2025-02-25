@@ -1,26 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rooms</title>
 </head>
+
 <body>
-    <a href="{% url 'create-room' %}">CREATE ROOM</a>
-    <hr>
-   
-    <div class="room-container">
-        {% for room in rooms %}
-        <div class="room">
-            <a href="{% url 'delete-room' pk=room.id %}">DELETE</a>
-            <a href="{% url 'update-room' pk=room.id %}">EDIT</a>
-            
-            <span>@{{ room.host.username }}</span>
-            <h5>{{ room.id }}</h5>
-            <h3><a href="{% url 'room-detail' room.id %}">Topic: {{ room.name }}</a></h3>
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        .the_rooms {
+            display: grid;
+            grid-template-columns: 1fr 5fr;
+        }
+    </style>
+    <div class="the_rooms">
+        <div class="browse">
+            <h3>Browse Topics</h3>
             <hr>
+            <form method="POST" action="{% url 'the_rooms' %}">
+                {% csrf_token %}
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search Rooms....">
+            </form>
+            <hr>
+            {% if request.user.is_authenticated %}
+            <p>Hello {{request.user}}</p>
+            <a href="{% url 'logout' %}">logout</a>
+            {% else %}
+            <a href="{% url 'login' %}">login</a>
+            {% endif %}
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                    {% endfor %}
+            </ul>
+            {% endif %}
+            <hr>
+            <p>Total Rooms: {{ room_count }}</p>
+            <hr>
+            <div>
+                <a href="{% url 'the_rooms' %}">All</a>
+            </div>
+
+            {% for topic in topics %}
+            <div>
+                <a href="{% url 'the_rooms' %}?q={{topic.name}}">{{topic}}</a>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <a href="{% url 'create-room' %}">CREATE ROOM</a>
+        <hr>
+
+        <div class="room-container">
+            {% for room in rooms %}
+            <div class="room">
+                {% if request.user == room.host %}
+                <a href="{% url 'delete-room' pk=room.id %}">DELETE</a>
+                <a href="{% url 'update-room' pk=room.id %}">EDIT</a>
+                {% endif %}
+
+                <span>@{{ room.host.username }}</span>
+                <h5>{{ room.id }}</h5>
+                <h3><a href="{% url 'room-detail' room.id %}">Topic: {{ room.name }}</a></h3>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+{% endblock %}
 </body>
+
 </html>
